@@ -1,0 +1,5 @@
+outdir/
+nanokernel/
+.project
+.cproject
+.settings/
