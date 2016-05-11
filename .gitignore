@@ -3,3 +3,4 @@ nanokernel/
 .project
 .cproject
 .settings/
+*.swp

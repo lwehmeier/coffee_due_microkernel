@@ -1,4 +1,4 @@
-BSP ?= generic_pc
+BSP ?= arduino_due
 MDEF_FILE = prj.mdef
 KERNEL_TYPE = micro
 BOARD ?= arduino_due
