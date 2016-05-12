@@ -15,10 +15,10 @@
 DEFINE_SEMAPHORE(sem_on);
 /*typedef pulse packet callback*/
 typedef void (*ppcHndlr)(void);
-static volatile float ppc_dutyCycle=0.5;
+static float ppc_dutyCycle=0.5;
 static volatile uint8_t ppc_active=0;
 volatile uint32_t flowticks=0;
-void flow_counter_callback(struct device *port, uint32_t pin)
+void flow_counter_callback(struct device *port, struct gpio_callback *c, unsigned int pin)
 {
 	flowticks++;
 	printk(GPIO_NAME "%d triggered\n", pin);
@@ -36,8 +36,9 @@ void register_flow_callback()
 	if (ret) {
 		PRINT("Error configuring " GPIO_NAME "%d!\n", GPIO_FLOW_INT);
 	}
-
-	ret = gpio_set_callback(gpio_dev, flow_counter_callback);
+	struct gpio_callback cb;
+	gpio_init_callback(&cb, flow_counter_callback, (1<<GPIO_FLOW_INT));
+	ret=gpio_add_callback(gpio_dev, &cb);
 	if (ret) {
 		PRINT("Cannot setup callback!\n");
 	}
@@ -141,6 +142,15 @@ void mill_off()
 	struct device *gpio_dev = device_get_binding(GPIO_DRV_NAME);
 	gpio_pin_write(gpio_dev, GPIO_MILL_PIN, 0);
 }
+void mill(int ammount)
+{
+	if(ammount<0)
+		return;
+	mill_on();
+	PRINT("milling %d g coffee",ammount*(MSPERGCOFFEE/MSPERTICK));
+	task_sleep(ammount*(MSPERGCOFFEE/MSPERTICK));
+	mill_off();
+}
 void transport_dir(uint8_t dir)
 {
 	struct device *gpio_dev = device_get_binding(GPIO_DRV_NAME);
@@ -228,9 +238,10 @@ void run_gpio_callbacks()
 void ppc_task(void)
 {
 	printk("ppc task started");
+	ppc_dutyCycle=0.5;
 	ktimer_t t_on=task_timer_alloc();
-	task_timer_start(t_on, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*ppc_dutyCycle, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
-	PRINT("started timer, ticks %d, cycle %d",1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*ppc_dutyCycle, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ);
+	task_timer_start(t_on, 50,100,sem_on);//1000.0f/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*ppc_dutyCycle, 1000.0f/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
+	PRINT("started timer, ticks %d, cycle %d\r\n",100,((int)ppc_dutyCycle*1000));//((1000/MSPERTICK)*(((float)PPC_NUMPACKETS)/PPC_FREQ))*ppc_dutyCycle));
 	while(1)
 	{
 		task_sem_take(sem_on,TICKS_UNLIMITED);
@@ -239,14 +250,14 @@ void ppc_task(void)
 			pump_on();
 			PRINT("ppc on\r\n");
 		}
-		task_timer_start(t_on, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*(1-ppc_dutyCycle), 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
+		task_timer_start(t_on, 50,100,sem_on);//, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*(1-ppc_dutyCycle), 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
 		task_sem_take(sem_on,TICKS_UNLIMITED);
 		if(ppc_active)
 		{
 			pump_off();
-			PRINT("ppc on");
+			PRINT("ppc off\r\n");
 		}
-		task_timer_start(t_on, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*(ppc_dutyCycle), 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
+		task_timer_start(t_on, 50,100,sem_on);//, 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ*(ppc_dutyCycle), 1000/MSPERTICK*PPC_NUMPACKETS/PPC_FREQ, sem_on);
 	}
 }
 void init_cal()

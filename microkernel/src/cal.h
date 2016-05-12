@@ -38,9 +38,10 @@ static void _emptyPrint(const char *fmt, ...){}
 #define PPC_FREQ 100
 #define MSPERTICK 10
 #define FLOW_TICKSPERML 2
+#define MSPERGCOFFEE 10
 
 extern volatile uint32_t flowticks;
-void flow_counter_callback(struct device *port, uint32_t pin);
+void flow_counter_callback(struct device *port, struct gpio_callback *c, unsigned int pin);
 void register_flow_callback();
 void init_gpio();
 void heating_on();
@@ -50,6 +51,7 @@ void pump_off();
 void transport_on();
 void transport_off();
 void mill_on();
+void mill(int ammount);
 
 void transport_bottom();
 void transport_top();

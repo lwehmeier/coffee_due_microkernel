@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "cal.h"
+#include "parser.h"
 #include "frozen.h"
 
 #define TAKE(x) task_mutex_lock(x, TICKS_UNLIMITED)
@@ -152,7 +153,7 @@ void register_tmon_data(uint32_t event_type, uint32_t timestamp,
 }
 void coffee_test_entry(void)
 {
-	parse_json(0,0,0,0);
+	parser_addJob("{}",3);
 	PRINT("loading kernel ....... done\r\n");
 	init_cal();
 	PRINT("gpio init .... done\r\n");
