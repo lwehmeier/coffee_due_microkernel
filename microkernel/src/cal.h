@@ -31,7 +31,9 @@ static void _emptyPrint(const char *fmt, ...){}
 #define GPIO_TRANSPORT_PIN	21
 #define GPIO_MILL_PIN	17
 #define GPIO_NAME	"GPIO_"
+#define UART_BUFFERSIZE 256
 #define GPIO_DRV_NAME CONFIG_GPIO_ATMEL_SAM3_PORTB_DEV_NAME
+#define UART_DEV_NAME "UART_0"
 
 //number of half waves
 #define PPC_NUMPACKETS 100
@@ -39,6 +41,9 @@ static void _emptyPrint(const char *fmt, ...){}
 #define MSPERTICK 10
 #define FLOW_TICKSPERML 2
 #define MSPERGCOFFEE 10
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern volatile uint32_t flowticks;
 void flow_counter_callback(struct device *port, struct gpio_callback *c, unsigned int pin);
@@ -52,7 +57,7 @@ void transport_on();
 void transport_off();
 void mill_on();
 void mill(int ammount);
-
+void uart_get(char* data, unsigned *size);
 void transport_bottom();
 void transport_top();
 void pump_ml(uint16_t ml);
@@ -68,5 +73,9 @@ void reset_flow();
 void init_cal();
 void pump_on_ppc(uint8_t);
 void pump_off_ppc();
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* SRC_CAL_H_ */

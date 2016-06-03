@@ -8,7 +8,8 @@
 % ==================================================
   TASK k_logger      5 k_event_logger_demo  1024 [EXE]
   TASK coffee   	 5 coffee_test_entry    1024 [PHI]
-  TASK ppc		5 ppc_task		1024 [PHI]
+  TASK input   	 	 5 input_entry    		2048 [PHI]
+  TASK ppc			 5 ppc_task				1024 [PHI]
 % MUTEX NAME
 % ================
 %  MUTEX forkMutex0

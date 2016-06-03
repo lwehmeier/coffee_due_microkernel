@@ -10,8 +10,10 @@
 #include <zephyr.h>
 #include <stdint.h>
 #include <string.h>
+#include "cal.h"
 #include "frozen.h"
 #include "utils.h"
+#include "jobstorage-connector.h"
 
 uint8_t parser_checkString(char* data, int len)
 {
@@ -40,11 +42,26 @@ uint8_t parser_addJob(char* data, int len)
 		tok = find_json_token(arr,"Type");
 	if(tok)
 	{
+		char token[100];
+		snprintf(token, sizeof(token),"%.*s",tok->len, tok->ptr);
+		PRINT("Valid Type found, type is: %s",token);
 		switch(antoi(tok->ptr, tok->len))//switch type (1 coffee, 2 espresso, etc
 		{
-			char token[100];
-			snprintf(token, sizeof(token),"%.*s",tok->len, tok->ptr);
-			printf("Valid Type found, type is: %s",token);
+		case 1: //coffee
+			tok = find_json_token(arr,"ammountCoffee");
+			coffeeData c;
+			if(tok->ptr)
+				c.ammountCoffee=antoi(tok->ptr,tok->len);
+			tok = find_json_token(arr,"ammountWater");
+			if(tok->ptr)
+				c.ammountWater=antoi(tok->ptr,tok->len);
+			tok = find_json_token(arr,"temperature");
+			if(tok->ptr)
+				c.waterTemperature=antoi(tok->ptr,tok->len);
+			registerJobCoffee(c);
+			break;
+		default:
+			PRINT("INVALID JOBTYPE");
 		}
 	}
 	return 0;

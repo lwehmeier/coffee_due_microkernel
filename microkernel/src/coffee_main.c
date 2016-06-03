@@ -23,6 +23,7 @@
 #include "cal.h"
 #include "parser.h"
 #include "frozen.h"
+#include "runner.h"
 
 #define TAKE(x) task_mutex_lock(x, TICKS_UNLIMITED)
 #define GIVE(x) task_mutex_unlock(x)
@@ -151,42 +152,39 @@ void register_tmon_data(uint32_t event_type, uint32_t timestamp,
 		tmon_index = 0;
 	}
 }
-void coffee_test_entry(void)
+void init()
 {
+
 	parser_addJob("{}",3);
 	PRINT("loading kernel ....... done\r\n");
 	init_cal();
-	PRINT("gpio init .... done\r\n");
+	PRINT("CAL init .... done\r\n");
 	task_sleep(50);
 	transport_dir(1);
-	PRINT("init ........... done\r\n");
 	PRINT("initialising transport unit............");
 	transport_bottom();
 	PRINT(" done\r\n");
-	PRINT("starting coffee brewing..");
-	transport_dir(1);
-	transport_on();
-	PRINT("transport on\r\n");
-	task_sleep(200);
-	transport_off();
-	mill_on();
-	PRINT("mill on\r\n");
-	task_sleep(650);
-	mill_off();
-	task_sleep(200);//wait
-	transport_top();
-	task_sleep(75);
-	PRINT("heating on\r\n");
-	heating_on();
-	task_sleep(500);
-	pump_ml(200);
-	heating_off();
-	task_sleep(125);
-	pump_ml(20);
-	task_sleep(350);
-	transport_bottom();
-	PRINT("done\r\n");
-	PRINT("total flow ticks were: %d\r\n\r\n",flowticks);
+	PRINT("init ........... done\r\n");
+}
+void input_entry()
+{
+	while(1)
+	{
+		task_sleep(50);
+		char dat[128];
+		uart_get(dat,128);
+		parser_addJob(dat,128);
+	}
+}
+void coffee_test_entry(void)
+{
+	init();
+	while(1)
+	{
+		PRINT("processing next Job \r\n");
+		run_coffee();
+		task_sleep(100);
+	}
 
 	while(1)
 		task_sleep(1000);

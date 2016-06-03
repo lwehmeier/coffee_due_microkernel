@@ -12,20 +12,20 @@
 #include "cal.h"
 #ifdef __cplusplus
 
-template<typename JOBSTRUCT, jobType J, bool parallel=0>
+template<typename JOBSTRUCT, enum jobType J, bool parallel>
 class runner
 {
 public:
-	static uint8_t runJob()=0;
-	static uint8_t getNextJob()=0;
+	static uint8_t runJob();
+	static uint8_t getNextJob();
 	static uint8_t running(){return active;}
 protected:
 	static JOBSTRUCT currentJob, nextJob;
 	static bool active;
 };
 
-template<bool parallel=0>
-class runner<coffeeData,job_coffee>
+template<>
+class runner<coffeeData_struct,(jobType)1,0>
 {
 public:
 	static uint8_t runJob()
@@ -33,15 +33,25 @@ public:
 		if(!active)
 		{
 			currentJob=nextJob;
+			makeCoffee();
+			return 1;
 		}
+		return 0;
 	}
 	static uint8_t getNextJob()
 	{
 		if(availableJobs()&job_coffee)
+		{
 			nextJob=getJobCoffee();
+			return 1;
+		}
+		return 0;
 	}
+	static uint8_t running(){return active;}
 protected:
-	uint8_t makeCoffee()
+	static coffeeData_struct currentJob, nextJob;
+	static bool active;
+	static uint8_t makeCoffee()
 	{
 		transport_dir(0);
 		PRINT("initialising transport unit............");
@@ -71,12 +81,19 @@ protected:
 		transport_bottom();
 		PRINT("done\r\n");
 		PRINT("total flow ticks were: %d\r\n\r\n",flowticks);
+		return 1;
 	}
 };
 
-
+extern "C"
+{
 #endif
 
+void run_coffee();
+void run_tea();
+void run_espresso();
 
-
+#ifdef __cplusplus
+};
+#endif
 #endif /* SRC_RUNNER_H_ */
