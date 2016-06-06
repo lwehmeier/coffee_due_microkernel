@@ -16,7 +16,7 @@ enum jobType availableJobs()
 coffeeData getJobCoffee()
 {
 	coffeeData dat;
-	int *res=storage_getJob(job_coffee);
+	int *res=storage_popJob(job_coffee);
 	dat.ammountCoffee=res[2];
 	dat.ammountWater=res[1];
 	dat.waterTemperature=res[3];
@@ -26,7 +26,7 @@ coffeeData getJobCoffee()
 espressoData getJobEspresso()
 {
 	espressoData dat;
-	int *res=storage_getJob(job_espresso);
+	int *res=storage_popJob(job_espresso);
 	dat.ammountCoffee=res[2];
 	dat.ammountWater=res[1];
 	dat.waterTemperature=res[3];
@@ -36,7 +36,7 @@ espressoData getJobEspresso()
 teaData getJobTea()
 {
 	teaData dat;
-	int *res=storage_getJob(job_tea);
+	int *res=storage_popJob(job_tea);
 	dat.ammountWater=res[1];
 	dat.waterTemperature=res[3];
 	return dat;

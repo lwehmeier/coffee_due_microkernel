@@ -27,36 +27,7 @@ void flow_counter_callback(struct device *port, struct gpio_callback *c, unsigne
 	flowticks++;
 	printk(GPIO_NAME "%d triggered\n", pin);
 }
-void uart_init()
-{
-	struct device *dev = device_get_binding(UART_DEV_NAME);
-	sys_ring_buf_init(&uart_rb,UART_BUFFERSIZE,arrived_data);
-	uart_irq_rx_enable(dev);
-}
-static void uart_interrupt_handler(struct device *dev)
-{
-	uart_irq_update(dev);
-/*
-	if (uart_irq_tx_ready(dev)) {
-		data_transmitted = true;
-	}
-*/
-	if (uart_irq_rx_ready(dev))
-	{
-		uint32_t tmp;
-		uart_fifo_read(dev, &tmp, 1);
-		sys_ring_buf_put(&uart_rb,1,0,&tmp,1);
-	}
-}
-void uart_get(char* data, unsigned *size)
-{
-	uint16_t rm;
-	uint8_t rm2;
-	uint32_t garbage[*size];
-	sys_ring_buf_get(&uart_rb,&rm,&rm2,garbage,size);
-	for(int i=0;i<size;i++)
-		data[i]=garbage[i];
-}
+
 void register_flow_callback()
 {
 	struct device *gpio_dev = device_get_binding(GPIO_DRV_NAME);
@@ -297,7 +268,6 @@ void ppc_task(void)
 void init_cal()
 {
 	init_gpio();
-	uart_init();
 	register_flow_callback();
 	printk("cal init done..\r\n");
 }

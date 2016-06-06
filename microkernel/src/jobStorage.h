@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+struct jobData_struct {int jobType; int ammountCoffee/*gramm*/; int waterTemperature; int ammountWater;/*ml*/; int ammountSteam;};
 void storage_pushJob(int type, int ammountWater, int ammountCoffee, int tempWater, int steam);
 int* storage_popJob(int type);
 int* storage_getJob(int type);
