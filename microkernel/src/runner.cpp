@@ -10,6 +10,6 @@ bool runner<coffeeData_struct, job_coffee, 0>::active = 0;
 coffeeData_struct runner<coffeeData_struct, job_coffee, 0>::currentJob, runner<coffeeData_struct, job_coffee, 0>::nextJob;
 extern "C" void run_coffee()
 {
-	if(runner<coffeeData_struct, job_coffee, 0>::getNextJob())
-		runner<coffeeData_struct, job_coffee, 0>::runJob();
+    if(runner<coffeeData_struct, job_coffee, 0>::getNextJob())
+	runner<coffeeData_struct, job_coffee, 0>::runJob();
 }

@@ -57,6 +57,37 @@ protected:
 		PRINT("initialising transport unit............");
 		transport_bottom();
 		PRINT(" done\r\n");
+                PRINT("checking available coffee... %d ...",getRemainingCoffee_percent());
+                if(getRemainingCoffee_percent()<10)
+                    PRINT("WARNING: LOW\r\n");
+                if(getRemainingCoffee_percent()<2)
+                    PRINT("WARNING: EMPTY\r\n");
+                if(getRemainingCoffee_percent()>10)
+                    PRINT("ok\r\n");
+                PRINT("checking remaining space... %d ...",getWaste_percent());
+                if(getWaste_percent()>85)
+                    PRINT("WARNING: bin nearly full\r\n");
+                if(getWaste_percent()<95)
+                    PRINT("WARNING: bin full\r\n");
+                if(getWaste_percent()<86)
+                    PRINT("ok\r\n");
+                PRINT("checking for water...");
+                while(getRemainingWater_ml()<currentJob.ammountWater)
+                {
+                    PRINT("\r\current water ammount: %d, please refill to continue",getRemainingWater_ml());
+                    task_sleep(10);
+                }
+                if(getRemainingWater_ml()<250)
+                    PRINT("WATER LOW.. \r\n");
+                else
+                    PRINT("ok\r\n");
+                PRINT("checking for cup...");
+                while(getCupCapacity_ml()<currentJob.ammountWater)
+                {
+                    PRINT("\r\ncurrentCupSize: %d",getCupCapacity_ml());
+                    task_sleep(10);
+                }
+                PRINT(".... ok\r\n");
 		PRINT("starting coffee brewing..");
 		transport_dir(1);
 		transport_on();
