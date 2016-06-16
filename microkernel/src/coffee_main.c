@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <misc/shell.h>
+#include <irq.h>
 #define DEVICE_NAME "test shell"
 #include "cal.h"
 #include "parser.h"
@@ -32,7 +33,6 @@
 #ifdef PRINT
 #undef PRINT
 #endif
-static void _emptyPrint(const char *fmt, ...){}
 #define PRINT _emptyPrint
 
 static uint8_t initialized=0;
@@ -68,9 +68,9 @@ static void shell_add_coffee(int argc, char *argv[])
 		return;
 	}
 	coffeeData c;
-	c.ammountCoffee=antoi(argv[1],1);
-	c.ammountWater=antoi(argv[2],1);
-	c.waterTemperature=antoi(argv[3],1);
+	c.ammountCoffee=antoi(argv[1],3);
+	c.ammountWater=antoi(argv[2],3);
+	c.waterTemperature=antoi(argv[3],3);
 	c.ammountSteam=0;
 	registerJobCoffee(c);
 }
@@ -81,10 +81,14 @@ static void shell_list_jobs(int argc, char *argv[])
 	printk("    espresso: \r\n", availableJobs()&job_coffee);
 	printk("    tea: \r\n", availableJobs()&job_coffee);
 }
+void adc_init();
+void adc_print(int,char**);
 const struct shell_cmd commands[] = {
 		{ "add", shell_add_job },
 		{ "coffee", shell_add_coffee },
 		{ "ls", shell_list_jobs },
+		{ "adc_init", adc_init },
+		{ "adc_get", adc_print },
 	{ NULL, NULL }
 };
 void coffee_test_entry(void)
@@ -115,3 +119,4 @@ void k_event_logger_demo(void)
 {
 	task_group_start(PHI);
 }
+

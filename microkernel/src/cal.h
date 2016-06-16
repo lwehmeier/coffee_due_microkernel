@@ -11,11 +11,11 @@
 #include <zephyr.h>
 #include <misc/printk.h>
 #include <stdint.h>
-#define DEBUG
+//#define DEBUG
+static void _emptyPrint(const char *fmt, ...){}
 #ifdef DEBUG
 #define PRINT           printk
 #else
-static void _emptyPrint(const char *fmt, ...){}
 #define PRINT _emptyPrint
 #endif
 #include <device.h>
@@ -34,7 +34,15 @@ static void _emptyPrint(const char *fmt, ...){}
 #define UART_BUFFERSIZE 256
 #define GPIO_DRV_NAME CONFIG_GPIO_ATMEL_SAM3_PORTB_DEV_NAME
 #define UART_DEV_NAME "UART_0"
-
+#define TANK_VOLUME_ML 600
+#define TANK_HEIGTH_MM 150
+#define TANK_IR_CHNL 0
+#define CUP_SMALL_IR_CHNL 1
+#define CUP_LARGE_IR_CHNL 2
+#define WASTE_IR_CHNL 3
+#define COFFEE_IR_CHNL 4
+#define COFFEEBOX_HEIGTH 75
+#define WASTEBOX_HEIGTH 80
 //number of half waves
 #define PPC_NUMPACKETS 100
 #define PPC_FREQ 100
@@ -44,6 +52,8 @@ static void _emptyPrint(const char *fmt, ...){}
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+enum cupType {noCup=1, smallCup=2, largeCup=4};
 
 extern volatile uint32_t flowticks;
 void flow_counter_callback(struct device *port, struct gpio_callback *c, unsigned int pin);
@@ -73,7 +83,14 @@ void reset_flow();
 void init_cal();
 void pump_on_ppc(uint8_t);
 void pump_off_ppc();
-
+void adc_init();
+uint16_t adc_get(uint8_t);
+uint16_t calcDistanceGP120_mm(uint16_t adcVal);
+uint16_t getRemainingWater_ml();
+uint8_t getWaste_percent();
+uint8_t getRemainingCoffee_percent();
+enum cupType getCupSize();
+uint8_t getCupCapacity_ml();
 #ifdef __cplusplus
 };
 #endif
